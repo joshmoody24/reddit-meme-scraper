@@ -12,7 +12,7 @@ reddit = praw.Reddit(
 )
 
 subreddit = "memes"
-num_posts = 2000
+num_posts = 30
 
 df = pd.DataFrame(columns=[
     "post_id",
@@ -29,6 +29,7 @@ df = pd.DataFrame(columns=[
     "original",
     "over_18",
     "is_self",
+    "img_type",
     "img_url",
 ])
 
@@ -45,6 +46,16 @@ for post in tqdm(posts):
     is_self = post.is_self
     num_comments = post.num_comments
     img_url = post.url
+    
+    # img_type: Image (png/jpg), Gif (gif), Video (any other extension)
+    img_extension = img_url.split('.').pop().lower()
+    if(img_extension == "png" or img_extension == "jpg" or img_extension == "jpeg"):
+        img_type = "Image"
+    elif(img_extension == "gif"):
+        img_type = "Gif"
+    else:
+        img_type = "Video"
+
     upvotes = post.score
     # no memes have text on the post
     # text = post.selftext
@@ -52,7 +63,7 @@ for post in tqdm(posts):
     upvote_ratio = post.upvote_ratio
     downvotes = round(upvotes/upvote_ratio) - upvotes
     title = post.title
-
+    
     day_names = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 
     day_of_week = day_names[datetime.fromtimestamp(post.created_utc).weekday()]
@@ -67,7 +78,7 @@ for post in tqdm(posts):
 
     topComment = topComment.body
 
-    rows.append([post_id, post_name, title, day_of_week, topComment, num_comments, upvotes, downvotes, upvote_ratio, spoiler, edited, original, over_18, is_self, img_url])
+    rows.append([post_id, post_name, title, day_of_week, topComment, num_comments, upvotes, downvotes, upvote_ratio, spoiler, edited, original, over_18, is_self, img_type, img_url])
 
     # save image to folder
 
